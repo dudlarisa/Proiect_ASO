@@ -1,0 +1,20 @@
+{% extends 'authenticate/home.html'%}
+
+{% block title %}Rooms | {% endblock%}
+
+{% block content %}
+<div class="p-10 lg:p-20 text-center">
+    <h1 class="text-5xl lg:text-9xl text-white">Rooms</h1>
+</div>
+
+<form method="POST" action="checkview" class="lg:1-1/4 px-4 mx-auto">
+    {% csrf_token %}
+    <div class="mb-5">
+       <label class="text-pink">New room name:</label>
+       <input type="text" name="room_name" id="room_name" class="w-full mt-2 px-4 py-2 rounded-xl">
+    </div>
+
+   <button type="submit" class="px-5 py-3 rounded-xl text-white bg-teal-400 hover:bg-teal-700">Create room</button>
+
+</form>
+{% endblock %}

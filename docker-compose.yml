@@ -1,0 +1,27 @@
+version: '3.3'
+
+services:
+
+  db:
+    container_name: run-postgres
+    image: postgres
+    environment:
+      POSTGRES_DB: 'aso_db'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'DATAPASS'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+
+  backend:
+    container_name: run-backend
+    image: backend
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

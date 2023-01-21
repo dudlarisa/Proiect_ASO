@@ -1,0 +1,119 @@
+{% extends 'authenticate/home.html'%}
+
+{% block title %}Room: {{room}}{% endblock%}
+
+{% block content %}
+<div class="p-10 lg:p-20 text-center">
+    <h1 class="text-5xl lg:text-9xl text-white">{{room}}</h1>
+</div>
+<div id="display">
+
+</div>
+
+{% block javascript %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+
+{% load static%}
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script>
+            $(document).on('submit','#post-form',function(e){
+                e.preventDefault();
+
+                $.ajax({
+                  type:'POST',
+                  url:'/rooms/send',
+                  data:{
+                    username:$('#username').val(),
+                    room:$('#room').val(),
+                    message:$('#message').val(),
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                  },
+                  success: function(data){
+                    //alert(data)
+                    console.log("sent")
+                  }
+                });
+                document.getElementById('message').value = ''
+              });
+        </script>
+        <script>
+            $(document).ready(function(){
+            setInterval(function(){
+                $.ajax({
+                    type: 'GET',
+                    url : "/rooms/getMessages/{{room}}",
+                    success: function(response){
+                        console.log(response);
+                        $("#display").empty();
+                        for (var key in response.messages)
+                        {
+                            var temp="<div style='width:864px; margin:0 auto;' class='px-4 py-5 bg-teal-200 rounded-xl'><b>"+response.messages[key].user+"</b><p>"+response.messages[key].value+"</p><span class='time-left'>"+response.messages[key].date+"</span></div><br>";
+                            $("#display").append(temp);
+                        }
+                    },
+                    error: function(response){
+                        //alert('An error occured')
+                    }
+                });
+            },1000);
+            })
+        </script>
+        {% comment %} <script>
+            $(document).ready(function(){
+            setInterval(function(){
+                $.ajax({
+                    type: 'GET',
+                    url : "/rooms/getMessages/{{room}}/typing",
+                    data:{
+                        message:$('#message').val(),},
+                    success: function(response){
+                            var temp="<div style='width:864px; margin:0 auto;' class='px-4 py-5 bg-pink-200 rounded-xl'><b>"+TYPING"</div><br>";
+                            $("#display").append(temp);
+
+                    },
+                    error: function(response){
+                        //alert('An error occured')
+                    }
+                });
+            },1000);
+            })
+            </script>
+            <script type="text/javascript">
+            window.unload = function(){
+             document.getElementById('message').onchange= function(){
+             console.log("typing");
+             }
+             };
+            function typing() {
+                $("#typing").text("{{username}} is typing");
+                 document.getElementById('typing').innerHTML = "User is typing...! ";
+                 console.log("typing");
+            }
+            function make_blank(){
+                $("#typing").text("");
+                document.getElementById('typing').innerHTML = "";
+            }
+            </script>{% endcomment %}
+{% endblock javascript %}
+
+
+<div class="lg:w-2/4 mt-6 mx-4 lg:mx-auto p-4 bg-white rounded-xl">
+    <form id="post-form" method="post" action="." class="flex">
+        {%csrf_token%}
+        <input type="hidden" name="username" id="username" value="{{username}}"/>
+        <input type="hidden" name="room" id="room" value="{{room}}"/>
+        <p id="typing"></p>
+
+        <input type="text" id="message" name="message" class="flex-1 mr-3" placeholder="Introduce your message" id="chat-message-input"  />
+        <input type="submit" class="px-5 py-3 rounded-xl text-white bg-teal-300 hover:bg-teal-700" value="Send">
+
+    </form>
+</div>
+
+
+
+
+
+{% endblock %}
